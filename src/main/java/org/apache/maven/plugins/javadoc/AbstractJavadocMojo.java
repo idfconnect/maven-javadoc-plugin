@@ -66,6 +66,7 @@ import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
+import org.apache.maven.doxia.tools.SiteTool;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
@@ -272,6 +273,12 @@ public abstract class AbstractJavadocMojo extends AbstractMojo {
     // ----------------------------------------------------------------------
 
     /**
+     * SiteTool.
+     */
+    @Component
+    protected SiteTool siteTool;
+
+    /**
      * Archiver manager
      *
      * @since 2.5
@@ -330,8 +337,8 @@ public abstract class AbstractJavadocMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     protected MavenProject project;
 
-    @Parameter(defaultValue = "${mojoExecution}", readonly = true)
-    private MojoExecution mojo;
+    @Parameter(defaultValue = "${mojoExecution}", readonly = true, required = true)
+    protected MojoExecution mojoExecution;
 
     /**
      * Specify if the Javadoc should operate in offline mode.
@@ -423,10 +430,10 @@ public abstract class AbstractJavadocMojo extends AbstractMojo {
     private ArtifactRepository localRepository;
 
     /**
-     * The projects in the reactor for aggregation report.
+     * The reactor projects.
      */
-    @Parameter(property = "reactorProjects", readonly = true)
-    private List<MavenProject> reactorProjects;
+    @Parameter(defaultValue = "${reactorProjects}", required = true, readonly = true)
+    protected List<MavenProject> reactorProjects;
 
     /**
      * Set this to <code>true</code> to debug the Javadoc plugin. With this, <code>javadoc.bat(or.sh)</code>,
@@ -1821,7 +1828,7 @@ public abstract class AbstractJavadocMojo extends AbstractMojo {
     abstract void doExecute() throws MojoExecutionException, MojoFailureException;
 
     protected final void verifyRemovedParameter(String paramName) {
-        Xpp3Dom configDom = mojo.getConfiguration();
+        Xpp3Dom configDom = mojoExecution.getConfiguration();
         if (configDom != null) {
             if (configDom.getChild(paramName) != null) {
                 throw new IllegalArgumentException(
@@ -1831,7 +1838,7 @@ public abstract class AbstractJavadocMojo extends AbstractMojo {
     }
 
     private void verifyReplacedParameter(String oldParamName, String newParamNew) {
-        Xpp3Dom configDom = mojo.getConfiguration();
+        Xpp3Dom configDom = mojoExecution.getConfiguration();
         if (configDom != null) {
             if (configDom.getChild(oldParamName) != null) {
                 throw new IllegalArgumentException("parameter '" + oldParamName + "' has been replaced with "
@@ -4238,64 +4245,8 @@ public abstract class AbstractJavadocMojo extends AbstractMojo {
         }
 
         // locale
-        if (this.locale != null && !this.locale.isEmpty()) {
-            StringTokenizer tokenizer = new StringTokenizer(this.locale, "_");
-            final int maxTokens = 3;
-            if (tokenizer.countTokens() > maxTokens) {
-                throw new MavenReportException(
-                        "Unsupported option <locale/> '" + this.locale + "', should be language_country_variant.");
-            }
-
-            Locale localeObject = null;
-            if (tokenizer.hasMoreTokens()) {
-                String language = tokenizer.nextToken().toLowerCase(Locale.ENGLISH);
-                if (!Arrays.asList(Locale.getISOLanguages()).contains(language)) {
-                    throw new MavenReportException(
-                            "Unsupported language '" + language + "' in option <locale/> '" + this.locale + "'");
-                }
-                localeObject = new Locale(language);
-
-                if (tokenizer.hasMoreTokens()) {
-                    String country = tokenizer.nextToken().toUpperCase(Locale.ENGLISH);
-                    if (!Arrays.asList(Locale.getISOCountries()).contains(country)) {
-                        throw new MavenReportException(
-                                "Unsupported country '" + country + "' in option <locale/> '" + this.locale + "'");
-                    }
-                    localeObject = new Locale(language, country);
-
-                    if (tokenizer.hasMoreTokens()) {
-                        String variant = tokenizer.nextToken();
-                        localeObject = new Locale(language, country, variant);
-                    }
-                }
-            }
-
-            if (localeObject == null) {
-                throw new MavenReportException(
-                        "Unsupported option <locale/> '" + this.locale + "', should be language_country_variant.");
-            }
-
-            this.locale = localeObject.toString();
-            final List<Locale> availableLocalesList = Arrays.asList(Locale.getAvailableLocales());
-            if (StringUtils.isNotEmpty(localeObject.getVariant()) && !availableLocalesList.contains(localeObject)) {
-                StringBuilder sb = new StringBuilder();
-                sb.append("Unsupported option <locale/> with variant '").append(this.locale);
-                sb.append("'");
-
-                localeObject = new Locale(localeObject.getLanguage(), localeObject.getCountry());
-                this.locale = localeObject.toString();
-
-                sb.append(", trying to use <locale/> without variant, i.e. '")
-                        .append(this.locale)
-                        .append("'");
-                if (getLog().isWarnEnabled()) {
-                    getLog().warn(sb.toString());
-                }
-            }
-
-            if (!availableLocalesList.contains(localeObject)) {
-                throw new MavenReportException("Unsupported option <locale/> '" + this.locale + "'");
-            }
+        if (StringUtils.isNotEmpty(this.locale)) {
+            this.locale = siteTool.getSiteLocales(locale).get(0).toString();
         }
     }
 
@@ -6007,6 +5958,10 @@ public abstract class AbstractJavadocMojo extends AbstractMojo {
         } else {
             getLog().error(message);
         }
+    }
+
+    protected List<MavenProject> getReactorProjects() {
+        return reactorProjects;
     }
 
     /**

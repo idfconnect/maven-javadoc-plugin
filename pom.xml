@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven-javadoc-plugin</artifactId>
-  <version>3.5.1-SNAPSHOT</version>
+  <version>3.6.0-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <name>Apache Maven Javadoc Plugin</name>
@@ -112,16 +112,15 @@ under the License.
   <properties>
     <javaVersion>8</javaVersion>
     <mavenVersion>3.2.5</mavenVersion>
-    <doxiaVersion>1.11.1</doxiaVersion>
-    <doxia-sitetoolsVersion>1.11.1</doxia-sitetoolsVersion>
+    <doxiaSitetoolsVersion>2.0.0-M10</doxiaSitetoolsVersion>
     <wagonVersion>2.4</wagonVersion>
     <aetherVersion>1.0.0.v20140518</aetherVersion>
     <!-- https://cwiki.apache.org/confluence/x/VIHOCg#MavenEcosystemCleanup-ResolverandMaven -->
     <plexus-java.version>1.1.2</plexus-java.version>
     <jetty.version>9.4.50.v20221201</jetty.version>
     <!-- for ITs -->
-    <sitePluginVersion>3.12.1</sitePluginVersion>
-    <projectInfoReportsPluginVersion>3.4.2</projectInfoReportsPluginVersion>
+    <sitePluginVersion>4.0.0-M8</sitePluginVersion>
+    <projectInfoReportsPluginVersion>4.0.0-M1-SNAPSHOT</projectInfoReportsPluginVersion>
     <project.build.outputTimestamp>2023-02-12T17:50:15Z</project.build.outputTimestamp>
     <slf4jVersion>1.7.36</slf4jVersion>
   </properties>
@@ -209,7 +208,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.reporting</groupId>
       <artifactId>maven-reporting-api</artifactId>
-      <version>3.1.1</version>
+      <version>4.0.0-M6</version>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -231,14 +230,20 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-sink-api</artifactId>
-      <version>${doxiaVersion}</version>
+      <version>2.0.0-M6</version>
     </dependency>
 
     <!-- Doxia-sitetools -->
     <dependency>
       <groupId>org.apache.maven.doxia</groupId>
       <artifactId>doxia-site-renderer</artifactId>
-      <version>${doxia-sitetoolsVersion}</version>
+      <version>${doxiaSitetoolsVersion}</version>
+    </dependency>
+    <!-- Doxia-sitetools -->
+    <dependency>
+      <groupId>org.apache.maven.doxia</groupId>
+      <artifactId>doxia-integration-tools</artifactId>
+      <version>${doxiaSitetoolsVersion}</version>
     </dependency>
 
     <!-- wagon -->
@@ -285,7 +290,7 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.5.0</version>
+      <version>3.5.1</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
