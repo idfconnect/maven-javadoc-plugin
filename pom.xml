@@ -102,7 +102,18 @@ under the License.
     <system>Jenkins</system>
     <url>https://ci-builds.apache.org/job/Maven/job/maven-box/job/maven-javadoc-plugin/</url>
   </ciManagement>
+
   <distributionManagement>
+    <repository>
+      <id>idfcmaven</id>
+      <name>IDFC Release Repository</name>
+      <url>https://idfconnect.jfrog.io/artifactory/libs-release-local</url>
+    </repository>
+    <snapshotRepository>
+      <id>idfcmaven</id>
+      <name>IDFC Snapshot Repository</name>
+      <url>https://idfconnect.jfrog.io/artifactory/libs-snapshot-local</url>
+    </snapshotRepository>
     <site>
       <id>apache.website</id>
       <url>scm:svn:https://svn.apache.org/repos/asf/maven/website/components/${maven.site.path}</url>
@@ -285,7 +296,6 @@ under the License.
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-utils</artifactId>
-      <version>3.5.0</version>
     </dependency>
     <dependency>
       <groupId>commons-io</groupId>
