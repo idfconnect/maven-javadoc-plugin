@@ -363,6 +363,12 @@ public abstract class AbstractFixJavadocMojo extends AbstractMojo {
     private File outputDirectory;
 
     /**
+     * Specifies whether the Javadoc fix should be skipped.
+     */
+    @Parameter(property = "maven.javadoc.fix.skip", defaultValue = "false")
+    protected boolean skip;
+
+    /**
      * The Maven Project Object.
      */
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
@@ -413,6 +419,11 @@ public abstract class AbstractFixJavadocMojo extends AbstractMojo {
      */
     @Override
     public void execute() throws MojoExecutionException, MojoFailureException {
+        if (skip) {
+            getLog().info("Skipping javadoc fix");
+            return;
+        }
+
         if (!fixClassComment && !fixFieldComment && !fixMethodComment) {
             getLog().info("Specified to NOT fix classes, fields and methods. Nothing to do.");
             return;
@@ -646,6 +657,7 @@ public abstract class AbstractFixJavadocMojo extends AbstractMojo {
         properties.put("textOutputFile", clirrTextOutputFile.getAbsolutePath());
         properties.put("comparisonVersion", comparisonVersion);
         properties.put("failOnError", "false");
+        properties.put("maven.javadoc.fix.skip", "true");
         if (JavaVersion.JAVA_SPECIFICATION_VERSION.isBefore("8")) {
             // ensure that Java7 picks up TLSv1.2 when connecting with Central
             properties.put("https.protocols", "TLSv1.2");
